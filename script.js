@@ -86,7 +86,7 @@ function Book(id, title, author, pages, read) {
     this.read = read
 }
 
-function addBookToLibrary(title, author, pages, read) {
+function addBookToLibrary(title, author, pages, read) {  // add id
     newBook = new Book(title, author, pages, read)
     myLibrary.push(newBook)
     updateLibrary(myLibrary)
@@ -133,6 +133,8 @@ function addBookReadElement(container, book) {
     let text
     if (book.read) {
         let iconEl = document.createElement(`span`)
+        iconEl.id = book.id
+        
         iconEl.classList.add(`material-icons`)
         let icon = document.createTextNode(`done`)
         iconEl.appendChild(icon)
@@ -164,16 +166,31 @@ function addBookRemoveElement(container, book) {
     container.appendChild(el)
 }
 
-function deleteBook(library, id) {
-    library = library.filter((book) => book.id !== id)
-    updateLibrary(library)
-}
-
-function updateLibrary(library) {
+function updateLibrary() {
     let booksContainer = document.querySelector(`.books-container`)
     booksContainer.innerHTML = ``
-    displayBooks(library)
+
+    displayBooks(myLibrary)
+
+    const deleteButtons = document.querySelectorAll(`.book-delete`)
+    deleteButtons.forEach(e => e.addEventListener("click", deleteBook))
+    const readButtons = document.querySelectorAll(`.book-read`)
+    readButtons.forEach(e => e.addEventListener("click", toggleRead))
 }
 
-displayBooks(myLibrary)
-deleteBook(myLibrary, 2)
+function deleteBook(e) {
+    myLibrary = myLibrary.filter(book => book.id !== parseInt(e.target.id))
+    updateLibrary()
+}
+
+function toggleRead(e) {
+    myLibrary.map((book) => {
+        console.log(book.id, parseInt(e.target.id))
+        if (book.id === parseInt(e.target.id)) {
+            book.read = !book.read
+        }
+    })
+    updateLibrary()
+}
+
+updateLibrary()
