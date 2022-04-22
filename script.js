@@ -1,5 +1,12 @@
 let myLibrary = [
     {
+        id: 0,
+        title: `Harry Potter and the Order of Phoenix `,
+        author: `J.K. Rowling`,
+        pages: 500,
+        read: false
+    },
+    {
         id: 1,
         title: `Lord of The Rings Rings Rings`,
         author: `J.R.R Tolkien J.R.R Tolkien J.R.R`,
@@ -69,13 +76,6 @@ let myLibrary = [
         pages: 500,
         read: false
     },
-    {
-        id: 11,
-        title: `Harry Potter and the Order of Phoenix`,
-        author: `J.K. Rowling`,
-        pages: 500,
-        read: false
-    },
 ];
 
 function Book(id, title, author, pages, read) {
@@ -86,8 +86,9 @@ function Book(id, title, author, pages, read) {
     this.read = read
 }
 
-function addBookToLibrary(title, author, pages, read) {  // add id
-    newBook = new Book(title, author, pages, read)
+function addBookToLibrary(title, author, pages, read) {
+    let id = myLibrary.length
+    newBook = new Book(id, title, author, pages, read)
     myLibrary.push(newBook)
     updateLibrary(myLibrary)
 }
@@ -134,17 +135,24 @@ function addBookReadElement(container, book) {
     if (book.read) {
         let iconEl = document.createElement(`span`)
         iconEl.id = book.id
-        
+
         iconEl.classList.add(`material-icons`)
         let icon = document.createTextNode(`done`)
         iconEl.appendChild(icon)
         el.appendChild(iconEl)
 
         text = document.createTextNode(`Read`)
+
+        el.appendChild(text)
+
+        el.classList.remove(`unread`)
     } else {
         text = document.createTextNode(`Mark as read`)
+
+        el.appendChild(text)
+
+        el.classList.add(`unread`)
     }
-    el.appendChild(text)
 
     el.id = book.id
 
@@ -175,7 +183,7 @@ function updateLibrary() {
     const deleteButtons = document.querySelectorAll(`.book-delete`)
     deleteButtons.forEach(e => e.addEventListener("click", deleteBook))
     const readButtons = document.querySelectorAll(`.book-read`)
-    readButtons.forEach(e => e.addEventListener("click", toggleRead))
+    readButtons.forEach(btn => btn.addEventListener("click", toggleRead))
 }
 
 function deleteBook(e) {
@@ -185,10 +193,10 @@ function deleteBook(e) {
 
 function toggleRead(e) {
     myLibrary.map((book) => {
-        console.log(book.id, parseInt(e.target.id))
         if (book.id === parseInt(e.target.id)) {
             book.read = !book.read
         }
+        
     })
     updateLibrary()
 }

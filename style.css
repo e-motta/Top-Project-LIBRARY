@@ -9,7 +9,7 @@ html {
 
 .main {
     --header-height: 200px;
-    --footer-height: 100px;
+    --footer-height: 150px;
     --book-container-width: 900px;
     
     display: grid;
@@ -63,7 +63,7 @@ html {
 
 .footer {
     grid-column: 1 / -1;
-    background-image: linear-gradient(to top, rgb(29, 14, 14), rgb(149, 98, 98), rgb(202, 164, 164), rgb(240, 248, 255));
+    background-image: linear-gradient(to top, rgb(29, 14, 14), rgb(149, 98, 98), rgb(202, 164, 164), rgb(240, 248, 255), rgb(240, 248, 255));
     /* background-color: rgb(29, 14, 14); */
     color: rgb(233, 212, 212);
     display: flex;
@@ -95,7 +95,7 @@ html {
     border-radius: 10px;
     display: grid;
     grid-template-columns: 1fr auto;
-    grid-template-rows: 1fr auto auto;
+    grid-template-rows: 2fr 1fr auto;
     gap: 10px;
     box-shadow: 0 5px 15px rgb(241, 231, 231);
 }
@@ -120,7 +120,7 @@ html {
 
 .book-pages {
     font-size: .9em;
-    align-self: end;
+    align-self: center;
 }
 
 .book-read, .book-delete {
@@ -134,12 +134,16 @@ html {
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 3px
+    gap: 11px
+}
+
+.book-read {
+    width: 120px;
 }
 
 .book-read.unread {
-    background-color: rgb(202, 202, 202);
-    color: rgb(105, 105, 105);
+    color: rgb(245, 245, 245);
+    background-color: rgb(156, 140, 140);
 }
 
 .book-read span {
