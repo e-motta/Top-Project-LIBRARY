@@ -1,79 +1,30 @@
 let myLibrary = [
     {
         id: 0,
-        title: `Harry Potter and the Order of Phoenix `,
-        author: `J.K. Rowling`,
-        pages: 500,
-        read: false
+        title: `Infinite Jest`,
+        author: `David Foster Wallace`,
+        pages: 1079,
+        read: true
     },
     {
         id: 1,
-        title: `Lord of The Rings Rings Rings`,
-        author: `J.R.R Tolkien J.R.R Tolkien J.R.R`,
-        pages: 300,
+        title: `The Fellowship of the Ring`,
+        author: `J. R. R. Tolkien`,
+        pages: 423,
         read: true
     },
     {
         id: 2,
         title: `Harry Potter and the Order of Phoenix`,
         author: `J.K. Rowling`,
-        pages: 500,
-        read: false
+        pages: 766,
+        read: true
     },
     {
         id: 3,
-        title: `Go`,
-        author: `John Doe`,
-        pages: 500,
-        read: false
-    },
-    {
-        id: 4,
-        title: `Harry Potter and the Order of Phoenix`,
-        author: `J.K. Rowling`,
-        pages: 500,
-        read: false
-    },
-    {
-        id: 5,
-        title: `Lord of The Rings Rings Rings`,
-        author: `J.R.R Tolkien J.R.R Tolkien J.R.R`,
-        pages: 300,
-        read: true
-    },
-    {
-        id: 6,
-        title: `Harry Potter and the Order of Phoenix`,
-        author: `J.K. Rowling`,
-        pages: 500,
-        read: false
-    },
-    {
-        id: 7,
-        title: `Go`,
-        author: `John Doe`,
-        pages: 500,
-        read: false
-    },
-    {
-        id: 8,
-        title: `Harry Potter and the Order of Phoenix`,
-        author: `J.K. Rowling`,
-        pages: 500,
-        read: false
-    },
-    {
-        id: 9,
-        title: `Lord of The Rings Rings Rings`,
-        author: `J.R.R Tolkien J.R.R Tolkien J.R.R`,
-        pages: 300,
-        read: true
-    },
-    {
-        id: 10,
-        title: `Harry Potter and the Order of Phoenix`,
-        author: `J.K. Rowling`,
-        pages: 500,
+        title: `The Final Empire (Mistborn, #1)`,
+        author: `Brandon Sanderson`,
+        pages: 541,
         read: false
     },
 ];
@@ -84,13 +35,6 @@ function Book(id, title, author, pages, read) {
     this.author = author
     this.pages = pages
     this.read = read
-}
-
-function addBookToLibrary(title, author, pages, read) {
-    let id = myLibrary.length
-    newBook = new Book(id, title, author, pages, read)
-    myLibrary.push(newBook)
-    updateLibrary(myLibrary)
 }
 
 function displayBooks(library) {
@@ -201,4 +145,31 @@ function toggleRead(e) {
     updateLibrary()
 }
 
+function addBookToLibrary(title, author, pages, read) {
+    const id = myLibrary.length
+    newBook = new Book(id, title, author, pages, read)
+    myLibrary.push(newBook)
+    updateLibrary(myLibrary)
+}
+
+function closeModal() {
+    const closeButton = document.querySelector(`.modal__close`)
+    closeButton.click()
+}
+
+function handeSubmit(e) {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const formProps = Object.fromEntries(formData)
+
+    addBookToLibrary(formProps[`book-title`], formProps[`book-author`], formProps[`book-pages`], formProps[`book-read`])
+
+    closeModal()
+    e.target.reset()
+}
+
 updateLibrary()
+
+newBookForm = document.querySelector(`#add-book-form`)
+newBookForm.addEventListener(`submit`, handeSubmit)

@@ -31,8 +31,21 @@
         <label class="modal__bg" for="modal-1"></label>
         <div class="modal__inner">
             <label class="modal__close" for="modal-1"></label>
-            <h2>Caaaats FTW!</h2>
-            <p><img src="" alt="" />Aliquam in sagittis nulla. Curabitur euismod diam eget risus venenatis, sed dictum lectus bibendum. Nunc nunc nisi, hendrerit eget nisi id, rhoncus rutrum velit. Nunc vel mauris dolor. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Aliquam fringilla quis nisi eget imperdiet.</p>
+
+            <fieldset class="modal__inner">
+                <legend>Add a new book</legend>
+                <form action="" method="get" class="add-book-form" id="add-book-form">
+                    <label for="book-title" class="book-title-label">Book title</label>
+                    <input type="text" id="book-title" name="book-title" class="book-title-input" required>
+                    <label for="book-author" class="book-author-label">Book author</label>
+                    <input type="text" id="book-author" name="book-author" class="book-author-input" required>
+                    <label for="book-pages" class="book-pages-label">Number of pages</label>
+                    <input type="number" id="book-pages" name="book-pages" class="book-pages-input" required>
+                    <label for="book-read" class="book-read-label">Finished reading</label>
+                    <input type="checkbox" id="book-read" name="book-read" class="book-read-input">
+                </form>
+                <button type="submit" class="submit-form-btn" id="submit-1" value="Submit" form="add-book-form">Submit</button>
+            </fieldset>
         </div>
     </div>
 </body>

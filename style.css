@@ -147,6 +147,7 @@ html {
 .book-read.unread {
     color: rgb(245, 245, 245);
     background-color: rgb(156, 140, 140);
+    justify-content: center;
 }
 
 .book-read span {
@@ -194,6 +195,9 @@ html {
   
   .modal-state:checked + .modal .modal__inner {
     top: 0;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    gap: 40px;
   }
   
   .modal__inner {
@@ -203,13 +207,13 @@ html {
     right: 0;
     bottom: 0;
     left: 0;
-    width: 50%;
+    width: 650px;
     margin: auto;
     overflow: auto;
-    background: #fff;
+    background: aliceblue;
     border-radius: 5px;
     padding: 1em 2em;
-    height: 50%;
+    height: 450px;
   }
   
   .modal__close {
@@ -252,3 +256,73 @@ html {
       box-sizing: border-box;
     }
   }
+
+/* Modal form */
+
+div.modal__inner {
+    height: 500px;
+}
+
+fieldset.modal__inner {
+    color: rgb(63, 45, 45);
+    font-size: 1.43em;
+    text-align: center;
+}
+
+.add-book-form {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 15px;
+    padding-top: 30px;
+    /* color: rgb(63, 45, 45); */
+    color: white;
+}
+
+.book-title-label,
+.book-author-label,
+.book-pages-label,
+.book-read-label {
+    justify-self: end;
+    align-self: center;
+    /* border: 3px solid rgb(88, 64, 64); */
+    background-color: rgb(88, 64, 64);
+    border-radius: 5px;
+    padding: 7px 14px;
+    font-size: 0.9em;
+}
+
+.book-title-input,
+.book-author-input,
+.book-pages-input,
+.book-read-input {
+    justify-self: start;
+    width: 300px;
+    align-self: center;
+    height: 25px;
+    border: 3px solid rgb(88, 64, 64);
+    border-radius: 5px;
+    font-size: 0.8em;
+    margin-left: 0px;
+    background-color: aliceblue;
+    padding: 14px 2px;
+}
+
+.book-read-input {
+    width: 32px;
+    transform: scale(1.2,1.2);
+}
+
+.submit-form-btn {
+    width: fit-content;
+    justify-self: center;
+    border-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 20px;
+    padding: 15px 30px;
+    border-radius: 7px;
+    cursor: pointer;
+    background-color: rgb(88, 64, 64);
+    color: aliceblue;
+}
