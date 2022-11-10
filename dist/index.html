@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+    />
+    <script src="main.js" defer></script>
+    <title>PROJECT: LIBRARY</title>
+  </head>
+  <body>
+    <div class="main">
+      <div class="header">
+        <span class="material-icons-outlined logo">local_library</span>
+        <span class="logo-title">My Library</span>
+        <div class="header-content">
+          <div id="user-container" class="user-container">
+            <div id="user-pic"></div>
+            <div class="sign-out-container">
+              <div id="user-name"></div>
+              <button id="sign-out" class="btn hidden">Sign-out</button>
+            </div>
+            <button id="sign-in" class="btn sign-in-btn">
+              <i class="material-icons">account_circle</i>Sign-in with Google
+            </button>
+          </div>
+          <label class="add-book-btn btn" for="modal-1"
+            ><span class="material-icons-outlined add-icon">add</span>Add
+            book</label
+          >
+        </div>
+      </div>
+      <div class="books-container"></div>
+      <div class="footer">
+        <span class="material-icons">copyright</span>
+        <span>Eduardo</span>
+      </div>
+    </div>
+    <input class="modal-state" id="modal-1" type="checkbox" />
+    <div class="modal">
+      <label class="modal__bg" for="modal-1"></label>
+      <div class="modal__inner">
+        <label class="modal__close" for="modal-1"></label>
+
+        <fieldset class="modal__inner">
+          <legend>Add a new book</legend>
+          <form action="" method="get" class="add-book-form" id="add-book-form">
+            <label for="book-title" class="book-title-label">Book title</label>
+            <input
+              type="text"
+              id="book-title"
+              name="book-title"
+              class="book-title-input"
+              required
+            />
+            <label for="book-author" class="book-author-label"
+              >Book author</label
+            >
+            <input
+              type="text"
+              id="book-author"
+              name="book-author"
+              class="book-author-input"
+              required
+            />
+            <label for="book-pages" class="book-pages-label"
+              >Number of pages</label
+            >
+            <input
+              type="number"
+              id="book-pages"
+              name="book-pages"
+              class="book-pages-input"
+              required
+            />
+            <label for="book-read" class="book-read-label"
+              >Finished reading</label
+            >
+            <input
+              type="checkbox"
+              id="book-read"
+              name="book-read"
+              class="book-read-input"
+            />
+          </form>
+          <button
+            type="submit"
+            class="submit-form-btn"
+            id="submit-1"
+            value="Submit"
+            form="add-book-form"
+          >
+            Submit
+          </button>
+        </fieldset>
+      </div>
+    </div>
+  </body>
+</html>
