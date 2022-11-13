@@ -1,6 +1,8 @@
 import "./reset.css";
 import "./style.css";
 
+import DOMHandler from "./dom_handler";
+
 // Import Firebase SDKs
 // https://firebase.google.com/docs/web/setup#available-libraries
 import { initializeApp } from "firebase/app";
@@ -16,10 +18,12 @@ import {
   getFirestore,
   collection,
   addDoc,
+  getDoc,
+  getDocs,
+  deleteDoc,
   query,
   orderBy,
   limit,
-  onSnapshot,
   setDoc,
   updateDoc,
   doc,
@@ -27,6 +31,7 @@ import {
 } from "firebase/firestore";
 import { getPerformance } from "firebase/performance";
 
+// ### Firebase ###
 // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBzvedVoohmLiocZ60gA0N18cTy9RmzOM4",
@@ -83,7 +88,7 @@ function addSizeToGoogleProfilePic(url) {
   return url;
 }
 
-function authStateObserver(user) {
+async function authStateObserver(user) {
   if (user) {
     // Set name and profile pic
     let profilePicUrl = getProfilePicUrl();
@@ -100,18 +105,8 @@ function authStateObserver(user) {
 
     signInButtonElement.classList.add("hidden");
 
-    // TODO: Show user books
-    const books = [
-      {
-        id: 0,
-        title: `Infinite`,
-        author: `David Foster Wallace`,
-        pages: 1079,
-        read: true,
-      },
-    ];
-
-    library.updateBooks(books);
+    // Show user books
+    await library.loadUserBooks();
     domHandler.renderBooks();
   } else {
     // Hide name, profile pic and Sign-out button; show Sign-in button
@@ -121,8 +116,8 @@ function authStateObserver(user) {
 
     signInButtonElement.classList.remove("hidden");
 
-    // TODO: Hide user books
-    library.updateBooks();
+    // Hide user books
+    library.loadSampleBooks();
     domHandler.renderBooks();
   }
 }
@@ -130,197 +125,127 @@ function authStateObserver(user) {
 signOutButtonElement.addEventListener("click", signOutUser);
 signInButtonElement.addEventListener("click", signIn);
 
-// Firebase Firestore Database
-// asyncFunction saveBook()
-
 // ## App ##
 
-function Book(id, title, author, pages, read) {
-  return { id, title, author, pages, read };
-}
+import Book from "./book";
 
 function Library() {
-  const sampleBooks = [
-    {
-      id: 0,
-      title: `Infinite Jest`,
-      author: `David Foster Wallace`,
-      pages: 1079,
-      read: true,
-    },
-    {
-      id: 1,
-      title: `The Fellowship of the Ring`,
-      author: `J. R. R. Tolkien`,
-      pages: 423,
-      read: true,
-    },
-    {
-      id: 2,
-      title: `Harry Potter and the Order of Phoenix`,
-      author: `J.K. Rowling`,
-      pages: 766,
-      read: true,
-    },
-    {
-      id: 3,
-      title: `The Final Empire (Mistborn, #1)`,
-      author: `Brandon Sanderson`,
-      pages: 541,
-      read: false,
-    },
-  ];
+  let state = { books: [] };
 
-  let books = sampleBooks;
-
-  function updateBooks(newBooks) {
-    books = newBooks;
+  function loadSampleBooks() {
+    state.books = [
+      {
+        id: 0,
+        title: `Infinite Jest`,
+        author: `David Foster Wallace`,
+        pages: 1079,
+        read: true,
+      },
+      {
+        id: 1,
+        title: `The Fellowship of the Ring`,
+        author: `J. R. R. Tolkien`,
+        pages: 423,
+        read: true,
+      },
+      {
+        id: 2,
+        title: `Harry Potter and the Order of Phoenix`,
+        author: `J.K. Rowling`,
+        pages: 766,
+        read: true,
+      },
+      {
+        id: 3,
+        title: `The Final Empire (Mistborn, #1)`,
+        author: `Brandon Sanderson`,
+        pages: 541,
+        read: false,
+      },
+    ];
   }
 
-  function deleteBook(e, books) {
-    library.books = books.filter((book) => book.id !== parseInt(e.target.id));
-  }
+  async function loadUserBooks() {
+    const booksQuery = await getDocs(
+      collection(getFirestore(), "library"),
+      orderBy("timestamp")
+    );
 
-  function toggleRead(e, books) {
-    books.forEach((book) => {
-      if (book.id === parseInt(e.target.id)) {
-        book.read = !book.read;
-      }
+    state.books = [];
+
+    booksQuery.forEach((doc) => {
+      const book = doc.data();
+      book.id = doc.id;
+      state.books.push(book);
     });
-    console.log("books", books);
+
+    return state.books;
   }
 
-  function addBook(title, author, pages, read) {
-    // TODO
-    const id = books.length;
+  async function addBook(title, author, pages, read) {
+    if (isUserSignedIn()) {
+      const newBook = new Book(
+        title,
+        author,
+        pages,
+        read,
+        getAuth().currentUser.email,
+        serverTimestamp()
+      );
 
-    const newBook = new Book(id, title, author, pages, read);
+      try {
+        await addDoc(collection(getFirestore(), "library"), newBook);
+        await loadUserBooks();
+        domHandler.renderBooks();
+      } catch (error) {
+        console.error("Error saving book to library database", error);
+      }
+    } else {
+      const newBook = new Book(title, author, pages, read);
+      newBook.id = state.books.length;
+      state.books.push(newBook);
+      domHandler.renderBooks();
+    }
+  }
 
-    books.push(newBook);
+  async function deleteBook(e, books = null) {
+    if (isUserSignedIn()) {
+      await deleteDoc(doc(getFirestore(), "library", e.target.id));
+      await loadUserBooks();
+      domHandler.renderBooks();
+    } else {
+      library.state.books = books.filter(
+        (book) => book.id !== parseInt(e.target.id)
+      );
+    }
+  }
+
+  async function toggleRead(e, books = null) {
+    if (isUserSignedIn()) {
+      const bookRef = doc(getFirestore(), "library", e.target.id);
+      const book = await getDoc(bookRef, e.target.id);
+      await updateDoc(bookRef, {
+        read: book.data().read ? false : true,
+      });
+      await loadUserBooks();
+      domHandler.renderBooks();
+    } else {
+      books.forEach((book) => {
+        if (book.id === parseInt(e.target.id)) {
+          book.read = !book.read;
+        }
+      });
+    }
   }
 
   return {
-    books,
-    updateBooks,
+    state,
+    loadSampleBooks,
+    loadUserBooks,
+    addBook,
     deleteBook,
     toggleRead,
-    addBook,
-    handleSubmit,
   };
-}
-
-function DOMHandler(library) {
-  function displayBooks(books = library.sampleBooks) {
-    const booksContainer = document.querySelector(`.books-container`);
-
-    books.forEach((book) => {
-      const bookEl = document.createElement(`div`);
-      bookEl.classList.add(`book`);
-
-      addBookTextElement(bookEl, `book-title`, book.title);
-      addBookTextElement(bookEl, `book-author`, book.author);
-      addBookPagesElement(bookEl, book);
-      addBookReadElement(bookEl, book);
-      addBookRemoveElement(bookEl, book);
-
-      booksContainer.appendChild(bookEl);
-    });
-  }
-
-  function addBookTextElement(container, cls, textAttr) {
-    const el = document.createElement(`div`);
-    const text = document.createTextNode(textAttr);
-
-    el.classList.add(cls);
-    el.appendChild(text);
-    container.appendChild(el);
-  }
-
-  function addBookPagesElement(container, book) {
-    const el = document.createElement(`div`);
-    const text = document.createTextNode(`${book.pages} pages`);
-
-    el.classList.add(`book-pages`);
-    el.appendChild(text);
-    container.appendChild(el);
-  }
-
-  function addBookReadElement(container, book) {
-    const el = document.createElement(`button`);
-
-    el.classList.add(`book-read`);
-
-    let text;
-    if (book.read) {
-      const iconEl = document.createElement(`span`);
-      const icon = document.createTextNode(`done`);
-
-      iconEl.id = book.id;
-
-      iconEl.classList.add(`material-icons`);
-      iconEl.appendChild(icon);
-      el.appendChild(iconEl);
-
-      text = document.createTextNode(`Read`);
-
-      el.appendChild(text);
-
-      el.classList.remove(`unread`);
-    } else {
-      text = document.createTextNode(`Mark as read`);
-
-      el.appendChild(text);
-
-      el.classList.add(`unread`);
-    }
-
-    el.id = book.id;
-
-    container.appendChild(el);
-  }
-
-  function addBookRemoveElement(container, book) {
-    const el = document.createElement(`button`);
-    const text = document.createTextNode(`delete_forever`);
-
-    el.classList.add(`book-delete`);
-    el.classList.add(`material-icons`);
-
-    el.appendChild(text);
-
-    el.id = book.id;
-
-    container.appendChild(el);
-  }
-
-  function renderBooks() {
-    const booksContainer = document.querySelector(`.books-container`);
-    booksContainer.innerHTML = ``;
-
-    displayBooks(library.books);
-
-    const deleteButtons = document.querySelectorAll(`.book-delete`);
-    deleteButtons.forEach((e) =>
-      e.addEventListener("click", (e) => {
-        library.deleteBook(e, library.books);
-        renderBooks(e);
-      })
-    );
-    const readButtons = document.querySelectorAll(`.book-read`);
-    readButtons.forEach((btn) =>
-      btn.addEventListener("click", (e) => {
-        library.toggleRead(e, library.books);
-        renderBooks(e);
-      })
-    );
-  }
-
-  function closeModal() {
-    const closeButton = document.querySelector(`.modal__close`);
-    closeButton.click();
-  }
-
-  return { displayBooks, renderBooks, closeModal };
 }
 
 // Form handler
@@ -346,6 +271,7 @@ function addFormHandler() {
   newBookForm.addEventListener(`submit`, handleSubmit);
 }
 
+// Run
 const library = Library();
 const domHandler = DOMHandler(library);
 domHandler.renderBooks();
