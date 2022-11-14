@@ -1,9 +1,8 @@
-export default function DOMHandler(library) {
-  function displayBooks(books = library.state.books) {
-    if (books === undefined) return null;
+export default function DOMHandler() {
+  function displayBooks(books) {
+    if (books === undefined || books.length === 0) return null;
 
     const booksContainer = document.querySelector(`.books-container`);
-
     books.forEach((book) => {
       const bookEl = document.createElement(`div`);
       bookEl.classList.add(`book`);
@@ -84,24 +83,23 @@ export default function DOMHandler(library) {
     container.appendChild(el);
   }
 
-  function renderBooks() {
+  function renderBooks(books, deleteBook, toggleRead) {
     const booksContainer = document.querySelector(`.books-container`);
     booksContainer.innerHTML = ``;
-
-    displayBooks(library.state.books);
+    displayBooks(books);
 
     const deleteButtons = document.querySelectorAll(`.book-delete`);
-    deleteButtons.forEach((e) =>
-      e.addEventListener("click", (e) => {
-        library.deleteBook(e, library.state.books);
-        renderBooks(e);
+    deleteButtons.forEach((btn) =>
+      btn.addEventListener("click", (e) => {
+        deleteBook(e, books);
+        renderBooks(books, deleteBook, toggleRead);
       })
     );
     const readButtons = document.querySelectorAll(`.book-read`);
     readButtons.forEach((btn) =>
       btn.addEventListener("click", (e) => {
-        library.toggleRead(e, library.state.books);
-        renderBooks(e);
+        toggleRead(e, books);
+        renderBooks(books, deleteBook, toggleRead);
       })
     );
   }
@@ -111,5 +109,73 @@ export default function DOMHandler(library) {
     closeButton.click();
   }
 
-  return { displayBooks, renderBooks, closeModal };
+  function signIn(userName) {
+    const userPicElement = document.querySelector("#user-pic");
+    const userNameElement = document.querySelector("#user-name");
+    const signOutButtonElement = document.querySelector("#sign-out");
+    const signInButtonElement = document.querySelector("#sign-in");
+
+    userNameElement.textContent = userName;
+
+    userNameElement.classList.remove("hidden");
+    userPicElement.classList.remove("hidden");
+    signOutButtonElement.classList.remove("hidden");
+
+    signInButtonElement.classList.add("hidden");
+  }
+
+  function signOut() {
+    const userPicElement = document.querySelector("#user-pic");
+    const userNameElement = document.querySelector("#user-name");
+    const signOutButtonElement = document.querySelector("#sign-out");
+    const signInButtonElement = document.querySelector("#sign-in");
+
+    userNameElement.classList.add("hidden");
+    userPicElement.classList.add("hidden");
+    signOutButtonElement.classList.add("hidden");
+
+    signInButtonElement.classList.remove("hidden");
+  }
+
+  function addAuthHandler(signOutUser, signIn) {
+    const signOutButtonElement = document.querySelector("#sign-out");
+    const signInButtonElement = document.querySelector("#sign-in");
+
+    signOutButtonElement.addEventListener("click", signOutUser);
+    signInButtonElement.addEventListener("click", signIn);
+  }
+
+  function handleSubmit(e, addBook) {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const formProps = Object.fromEntries(formData);
+
+    addBook(
+      formProps[`book-title`],
+      formProps[`book-author`],
+      formProps[`book-pages`],
+      formProps[`book-read`]
+    );
+
+    closeModal();
+    e.target.reset();
+  }
+
+  function addFormHandler(addBook) {
+    const newBookForm = document.querySelector(`#add-book-form`);
+    newBookForm.addEventListener(`submit`, (e) => {
+      handleSubmit(e, addBook);
+    });
+  }
+
+  return {
+    displayBooks,
+    renderBooks,
+    closeModal,
+    signIn,
+    signOut,
+    addAuthHandler,
+    addFormHandler,
+  };
 }
